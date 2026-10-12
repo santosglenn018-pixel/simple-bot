@@ -90,24 +90,29 @@ class $modify(BotScheduler, CCScheduler) {
 
 // ---- Record inputs / inject inputs ----
 class $modify(BotBaseLayer, GJBaseGameLayer) {
+    bool isThePlayLayer() {
+        return static_cast<GJBaseGameLayer*>(PlayLayer::get()) == static_cast<GJBaseGameLayer*>(this);
+    }
+
     void handleButton(bool down, int button, bool isPlayer1) {
         auto& bot = Bot::get();
-        if (this != PlayLayer::get() || bot.mode == Mode::Off) {
+        if (!this->isThePlayLayer() || bot.mode == Mode::Off) {
             return GJBaseGameLayer::handleButton(down, button, isPlayer1);
         }
         if (bot.mode == Mode::Replay && !bot.injecting) {
             return; // ignore real input while the bot is driving
         }
         if (bot.mode == Mode::Record && button == 1) {
-            bot.actions.push_back({m_gameState.m_currentProgress + FRAME_OFFSET, down, isPlayer1});
+            int frame = static_cast<int>(m_gameState.m_currentProgress) + FRAME_OFFSET;
+            bot.actions.push_back(Action{frame, down, isPlayer1});
         }
         GJBaseGameLayer::handleButton(down, button, isPlayer1);
     }
 
-    void processCommands(float dt) {
+    void processCommands(float dt, bool isHalfTick, bool isLastTick) {
         auto& bot = Bot::get();
-        if (this == PlayLayer::get() && bot.mode == Mode::Replay) {
-            int frame = m_gameState.m_currentProgress;
+        if (this->isThePlayLayer() && bot.mode == Mode::Replay) {
+            int frame = static_cast<int>(m_gameState.m_currentProgress);
             bot.injecting = true;
             while (bot.index < bot.actions.size() && bot.actions[bot.index].frame <= frame) {
                 auto& a = bot.actions[bot.index];
@@ -116,7 +121,7 @@ class $modify(BotBaseLayer, GJBaseGameLayer) {
             }
             bot.injecting = false;
         }
-        GJBaseGameLayer::processCommands(dt);
+        GJBaseGameLayer::processCommands(dt, isHalfTick, isLastTick);
     }
 };
 
