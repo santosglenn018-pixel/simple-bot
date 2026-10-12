@@ -1,0 +1,24 @@
+{
+	"geode": "4.0.0",
+	"gd": {
+		"win": "2.2074",
+		"android": "2.2074",
+		"mac": "2.2074",
+		"ios": "2.2074"
+	},
+	"id": "yourname.simple-bot",
+	"name": "Simple Bot",
+	"version": "v1.0.0",
+	"developer": "yourname",
+	"description": "Frame-accurate macro recorder and replay bot. Record a run, then the bot replays it perfectly.",
+	"settings": {
+		"tps": {
+			"type": "int",
+			"name": "Physics TPS",
+			"description": "Fixed physics steps per second used while recording. Replays use the TPS stored in the macro.",
+			"default": 240,
+			"min": 60,
+			"max": 960
+		}
+	}
+}
